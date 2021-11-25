@@ -128,65 +128,65 @@ class PaginatorViewsTest(TestCase):
             slug='test-slug',
             description='Тестовое описание',
         )
-        post1 = Post.objects.create(
+        cls.post1 = Post.objects.create(
             author=cls.user,
             text='текст 1',
         )
-        post2 = Post.objects.create(
+        cls.post2 = Post.objects.create(
             author=cls.user,
             text='текст 2',
             group=cls.group
         )
-        post3 = Post.objects.create(
+        cls.post3 = Post.objects.create(
             author=cls.user,
             text='текст 3',
         )
-        post4 = Post.objects.create(
+        cls.post4 = Post.objects.create(
             author=cls.user,
             text='текст 4',
             group=cls.group
         )
-        post5 = Post.objects.create(
+        cls.post5 = Post.objects.create(
             author=cls.user,
             text='текст 5',
             group=cls.group
         )
-        post6 = Post.objects.create(
+        cls.post6 = Post.objects.create(
             author=cls.user,
             text='текст 6',
             group=cls.group
         )
-        post7 = Post.objects.create(
+        cls.post7 = Post.objects.create(
             author=cls.user,
             text='текст 7',
             group=cls.group
         )
-        post8 = Post.objects.create(
+        cls.post8 = Post.objects.create(
             author=cls.user,
             text='текст 8',
             group=cls.group
         )
-        post9 = Post.objects.create(
+        cls.post9 = Post.objects.create(
             author=cls.user,
             text='текст 9',
             group=cls.group
         )
-        post10 = Post.objects.create(
+        cls.post10 = Post.objects.create(
             author=cls.user,
             text='текст 10',
             group=cls.group
         )
-        post11 = Post.objects.create(
+        cls.post11 = Post.objects.create(
             author=cls.user,
             text='текст 11',
             group=cls.group
         )
-        post12 = Post.objects.create(
+        cls.post12 = Post.objects.create(
             author=cls.user,
             text='текст 12',
             group=cls.group
         )
-        post13 = Post.objects.create(
+        cls.post13 = Post.objects.create(
             author=cls.user,
             text='текст 13',
             group=cls.group
@@ -247,12 +247,12 @@ class NewPostTest(TestCase):
             slug='test-slug2',
             description='Тестовое описание2'
         )
-        post1 = Post.objects.create(
+        cls.post1 = Post.objects.create(
             author=cls.user,
             text='Текст поста',
             group=group2
         )
-        post2 = Post.objects.create(
+        cls.post2 = Post.objects.create(
             author=cls.user,
             text='Тестовая группа',
             group=group1

@@ -51,7 +51,9 @@ class PostCreateFormTest(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertRedirects(response, reverse('posts:profile', kwargs={'username': 'HasNoName'}))
+        self.assertRedirects(response, reverse(
+            'posts:profile', kwargs={'username': 'HasNoName'})
+        )
         self.assertEqual(Post.objects.count(), post_count + 1)
         self.assertTrue(
             Post.objects.filter(
@@ -62,20 +64,18 @@ class PostCreateFormTest(TestCase):
 
     def test_edit_post(self):
         """При отправке валидной формы пост редактируется."""
-        post = Post.objects.create(
-            author=self.user,
-            text='Тестовый текст'
-        )
         edit_form_data = {
             'text': 'Отредактированный текст',
             'group': 1
         }
         response = self.authorized_client.post(
-            reverse('posts:post_edit', kwargs={'post_id': '2'}),
+            reverse('posts:post_edit', kwargs={'post_id': '1'}),
             data=edit_form_data,
             follow=True
         )
-        self.assertRedirects(response, reverse('posts:post_detail', kwargs={'post_id': '2'}))
+        self.assertRedirects(response, reverse(
+            'posts:post_detail', kwargs={'post_id': '1'})
+        )
         self.assertTrue(
             Post.objects.filter(
                 text='Отредактированный текст',
