@@ -1,6 +1,5 @@
 from http import HTTPStatus
 from django.contrib.auth import get_user_model
-from django.http.response import Http404
 from django.test import Client, TestCase
 
 from ..models import Group, Post
