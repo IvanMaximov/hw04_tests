@@ -1,18 +1,12 @@
-import shutil
-import tempfile
 from django.contrib.auth import get_user_model
 
-from ..models import Post, Group
-from django.conf import settings
-from django.test import Client, TestCase, override_settings
+from posts.models import Post, Group
+from django.test import Client, TestCase
 from django.urls import reverse
 
 User = get_user_model()
 
-TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
-
-@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostCreateFormTest(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -28,11 +22,6 @@ class PostCreateFormTest(TestCase):
             text='Тестовая группа',
             group=cls.group
         )
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
     def setUp(self):
         self.user = User.objects.create_user(username='HasNoName')

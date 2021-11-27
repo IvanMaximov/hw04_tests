@@ -39,7 +39,7 @@ class Post(models.Model):
     text = models.TextField(
         validators=[validate_not_empty],
         verbose_name='Текст поста',
-        help_text='Текст нового поста'
+        help_text='Текст поста'
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
