@@ -1,13 +1,21 @@
+import shutil
+import tempfile
+
+from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django import forms
 
 from ..models import Group, Post
 
+TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
+
 User = get_user_model()
 
 
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostPagesTest(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -18,16 +26,35 @@ class PostPagesTest(TestCase):
             slug='test-slug',
             description='Тестовое описание',
         )
+        small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
+        )
+        uploaded = SimpleUploadedFile(
+            name='small.gif',
+            content=small_gif,
+            content_type='image/gif'
+        )
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовый текст',
-            group=cls.group
+            group=cls.group,
+            image=uploaded
         )
 
     def setUp(self):
         self.user = User.objects.create_user(username='HasNoName')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
@@ -52,9 +79,11 @@ class PostPagesTest(TestCase):
         text = post.text
         author = post.author.username
         group = post.group.title
+        image = post.image
         self.assertEqual(author, 'test_user')
         self.assertEqual(text, 'Тестовый текст')
         self.assertEqual(group, 'Тестовая группа')
+        self.assertEqual(image, 'posts/small.gif')
 
     def test_index_page_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом."""
@@ -127,7 +156,7 @@ class PaginatorViewsTest(TestCase):
             cls.post = Post.objects.create(
                 author=cls.user,
                 text='Тестовый текст',
-                group=cls.group
+                group=cls.group,
             )
 
     def setUp(self):
@@ -253,3 +282,33 @@ class NewPostTest(TestCase):
         self.assertNotEqual(post_group_slug_0, 'test-slug1')
         self.assertNotEqual(post_text_0, 'Тестовая группа')
         self.assertNotEqual(post_group_0, 'Тестовая группа 1')
+
+
+class CasheIndexTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='test_user')
+        cls.group = Group.objects.create(
+            title='Тестовая группа 1',
+            slug='test-slug1',
+            description='Тестовое описание1',
+        )
+        for cls.post in range(1, 5):
+            cls.post = Post.objects.create(
+                author=cls.user,
+                text='Тестовый текст',
+                group=cls.group,
+            )
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='HasNoName')
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
+
+    def test_index_cache(self):
+        """Кеширование index работает правильно"""
+        response = self.authorized_client.get(reverse('posts:index'))
+        context_data_len = response.context['page_obj'].count
+        post_context_cache_len = Post.objects.count()
+        self.assertNotEqual(context_data_len, post_context_cache_len)

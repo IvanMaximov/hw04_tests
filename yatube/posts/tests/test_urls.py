@@ -52,11 +52,6 @@ class PostURLTest(TestCase):
         response = self.authorized_client.get('/create/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def test_unexisting_page_url_exists_at_desired_location(self):
-        """Страница unexisting_page/ доступна любому пользователю."""
-        response = self.guest_client.get('/unexisting_page/')
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
         templates_url_names = {
@@ -71,3 +66,9 @@ class PostURLTest(TestCase):
             with self.subTest(adress=adress):
                 response = self.authorized_client.get(adress)
                 self.assertTemplateUsed(response, template)
+
+    def test_post_comment_url_unexists_at_desired_location(self):
+        """Страница posts/<post_id>/comment/ недоступна
+        неавторизованному пользователю."""
+        response = self.guest_client.get('/posts/1/comment/')
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
